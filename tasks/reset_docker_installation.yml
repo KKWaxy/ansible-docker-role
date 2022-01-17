@@ -1,26 +1,27 @@
 ---
-- name: Remove docker installation packages
+- name: "Remove docker installation packages"
   become: True
-  ignore_errors: True
-  apt: 
+  # ignore_errors: True
+  apt:
     name: "{{ item }}"
     state: absent
-    use: auto
-  whith_items: 
+    # use: auto
+    # check_mode: no
+  loop: 
     - docker
     - docker-engine
     - docker.io 
     - containerd
     - runc
-  when: ansible_distribution == 'ubuntu'
+  when: ansible_distribution == 'Ubuntu'
 
 - name:  Delete docker files
-  become: true
+  become: True
   file:
    path: /var/lib/docker
    state: absent
    mode: u+wr,g+wr,o+wr 
-  when: ansible_distribution == 'ubuntu'
+  when: ansible_distribution == 'Ubuntu'
   
 - name:  Delete containerd files
   become: true
@@ -28,6 +29,6 @@
     path: /var/lib/containerd
     state: absent
     mode: u+wr,g+wr,o+wr
-  when: ansible_distribution == 'ubuntu'
+  when: ansible_distribution == 'Ubuntu'
 
 ...

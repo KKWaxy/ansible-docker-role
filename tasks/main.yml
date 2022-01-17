@@ -4,11 +4,11 @@
   apt: 
     upgrade: yes
     update_cache: yes
-  when: ansible_distribution == 'ubuntu'
+  when: ansible_distribution == 'Ubuntu'
 
 - name:  Remove any docker installation packages.
-  import_task: reset_docker_installation.yaml
-  
+  include_tasks: reset_docker_installation.yml
+
 - name: Docker package installation.
   become: True
   package:
@@ -26,10 +26,10 @@
   register: docker_service_started
   when: docker_installed
 
-- name: Add user docker to docker group
+- name: Add connected user to the docker group
   become: True
   user:
-    name: {{ ansible_user }}
+    name: "{{ ansible_user }}"
     groups: docker
     append: yes
 ...
