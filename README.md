@@ -1,7 +1,7 @@
 ansible-docker
 =========
 
-This role aims to deploy doker stack on servers.
+This role permit to deploy the latest version of docker on any GNU/Linux based Operating System.
 
 Requirements
 ------------
