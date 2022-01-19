@@ -1,14 +1,4 @@
 ---
-# - name: Update and Upgrade Ubuntu OS
-#   become: True
-#   apt: 
-#     upgrade: yes
-#     update_cache: yes
-#   when: ansible_distribution == 'Ubuntu'
-
-# - name:  Remove any docker installation packages.
-#   include_tasks: reset_docker_installation.yml
-
 - name: Docker package installation.
   become: True
   package:
