@@ -6,13 +6,13 @@ This role permit to deploy the latest version of docker on any GNU/Linux based O
 Requirements
 ------------
 
-
 Role Variables
 --------------
 
-| | variable | description| default|
-| - | - | - |- |
-|  |`docker-compose` | Docker compose is |`true`|
+|-| Variables | type | Descriptions | Defaults |
+|-|-|-|-|-|
+|-|`docker_compose` |`bool`| Install docker-compose packahes as addon |`true`|
+|-|`reset_before`|`bool`| Reset all docker installations befor start new docker packages installation. |`true`|
 
 Dependencies
 ------------
