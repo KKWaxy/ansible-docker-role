@@ -32,4 +32,4 @@ BSD
 Author Information
 ------------------
 
-Wilfried KOUASSI:sunglasses: <Sysops && Devops && Cloud enginerr>
+Wilfried KOUASSI:sunglasses: <Sysops:computer: && Devops:keyboard: && Cloud engineer:computer_mouse:>
