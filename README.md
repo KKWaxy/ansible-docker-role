@@ -10,9 +10,9 @@ Requirements
 Role Variables
 --------------
 
-| | variable | description|
-| - | :-: | - | 
-|  |`docker-compose` | Docker compose is |
+| | variable | description| default|
+| - | - | - |- |
+|  |`docker-compose` | Docker compose is |`true`|
 
 Dependencies
 ------------
