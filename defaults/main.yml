@@ -1,7 +1,7 @@
 ---
 
-# Add docker-compose orchestrator
+# Add docker-compose as addon
 docker_compose: true
 
-# Reset all docker installation befor installation
+# Reset all docker packages before start new installation installation
 reset_before: true
