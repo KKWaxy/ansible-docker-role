@@ -1,11 +1,11 @@
 ---
-- name: Docker package installation.
-  become: True
-  package:
-    name: docker.io
-    state: present
-    use: auto
-  register: docker_installed
+- name: Deploy docker on Ubuntu
+  include_tasks: ubuntu_deploy.yml
+  when: ansible_facts['distribution'] == "Ubuntu"
+
+- name:  Deploy docker on Centos
+  include_tasks: centos_deploy.yml
+  when: ansible_facts['distribution'] == "CentOS"
 
 - name: Start and enable docker service
   become: True
@@ -14,12 +14,11 @@
     state: started
     enabled: yes
   register: docker_service_started
-  when: docker_installed
+  when: docker_installed.changed
 
 - name: Add connected user to the docker group
   become: True
   user:
-    name: "{{ ansible_user }}"
+    name: ansible_user
     groups: docker
     append: yes
-...

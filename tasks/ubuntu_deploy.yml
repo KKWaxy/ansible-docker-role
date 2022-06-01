@@ -1,0 +1,81 @@
+---
+- name: Reset all docker installation
+  become: true
+  apt:
+    purge: yes
+    autoremove: yes
+    state: absent
+    pkg:
+      - docker
+      - docker-engine
+      - docker.io
+      - containerd
+      - runc
+      - docker-compose-plugin
+      - docker-compose
+  when: reset_before
+  
+- name: Deploy prerequisites
+  become: true
+  apt:
+    pkg:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    update_cache: true
+
+- name: Create keyrings folder
+  become: true
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    recurse: yes
+    mode: '0755'
+
+- name: Add apt key to the keyrings
+  become: true
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    keyring: /etc/apt/keyrings/docker.gpg
+    state: present
+
+- name: Get package architecture
+  shell: dpkg --print-architecture
+  register: package_architecture
+
+- name: Get lsb_release
+  shell: lsb_release -cs
+  register: lsb_release
+
+- name: Create docker.list
+  become: true
+  file:
+    state: touch
+    path: /etc/apt/sources.list.d/docker.list
+    mode: '0755'
+
+- name: Setup the repository
+  become: true
+  apt_repository:
+    state: present
+    repo: deb [arch="{{package_architecture.stdout}}" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "{{lsb_release.stdout}}" stable
+    filename: /etc/apt/sources.list.d/docker.list
+
+- name: Install docker packages
+  become: true
+  apt:
+    update_cache: true
+    pkg:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+  register: docker_installed
+
+- name: Add docker compose
+  become: true
+  apt:
+    pkg:
+      - docker-compose-plugin
+      - docker-compose
+  when: docker_compose

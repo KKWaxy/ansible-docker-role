@@ -1,4 +1,4 @@
 ---
+docker_compose: true
 
-# Default user to become
-
+reset_before: true

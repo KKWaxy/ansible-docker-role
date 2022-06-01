@@ -1,0 +1,55 @@
+---
+- name: Reset all docker installation
+  become: true
+  yum:
+    autoremove: yes
+    state: absent
+    name:
+      - docker
+      - docker-client
+      - docker-client-latest
+      - docker-common
+      - docker-latest
+      - docker-latest-logrotate
+      - docker-logrotate
+      - docker-engine
+  when: reset_before
+
+- name: Install yum-utils
+  become: true
+  yum:
+    state: present
+    update_cache: yes
+    name:
+      - yum-utils
+
+- name: Check if docker-ce.repo repo is present
+  become: true
+  stat:
+    path: /etc/yum.repos.d/docker-ce.repo
+  register: docker_ce_repos
+
+- name: Configure repository
+  become: true
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  when: not docker_ce_repos.stat.exists 
+
+- name:  Docker packages installation
+  become: true
+  yum:
+    state: present
+    update_cache: yes
+    name:
+    - containerd.io
+    - docker-ce-cli
+    - docker-ce
+  register: docker_installed
+
+- name: Add docker compose
+  become: true
+  yum:
+    state: present
+    name:
+      - docker-compose-plugin
+      - docker-compose
+  when: docker_compose
