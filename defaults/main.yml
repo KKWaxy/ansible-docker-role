@@ -1,4 +1,7 @@
 ---
+
+# Add docker-compose orchestrator
 docker_compose: true
 
+# Reset all docker installation befor installation
 reset_before: true
