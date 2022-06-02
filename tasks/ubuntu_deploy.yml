@@ -86,5 +86,4 @@
     name: docker
     state: started
     enabled: yes
-  register: docker_service_started
   when: ubuntu_docker_installed.changed
