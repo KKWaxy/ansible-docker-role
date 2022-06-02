@@ -70,7 +70,7 @@
       - docker-ce
       - docker-ce-cli
       - containerd.io
-  register: docker_installed
+  register: ubuntu_docker_installed
 
 - name: Add docker compose
   become: true
@@ -79,3 +79,12 @@
       - docker-compose-plugin
       - docker-compose
   when: docker_compose
+
+- name: Start and enable docker service
+  become: True
+  systemd: 
+    name: docker
+    state: started
+    enabled: yes
+  register: docker_service_started
+  when: ubuntu_docker_installed.changed

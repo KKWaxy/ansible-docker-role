@@ -7,15 +7,6 @@
   include_tasks: centos_deploy.yml
   when: ansible_facts['distribution'] == "CentOS"
 
-- name: Start and enable docker service
-  become: True
-  service: 
-    name: docker
-    state: started
-    enabled: yes
-  register: docker_service_started
-  when: docker_installed.changed
-
 - name: Add connected user to the docker group
   become: True
   user:
