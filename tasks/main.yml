@@ -17,25 +17,25 @@
       when: ansible_distribution == "CentOS"
 
     - name:  "Ubuntu: Remove and purge all docker packages"
-      apt:
-        purge: yes
-        state: absent
-        pkg:
-          - docker
-          - docker-engine
-          - docker-ce-cli
-          - docker-ce-rootless-extras
-          - docker-scan-plugin
-          - docker.io
-          - containerd
-          - runc
-          - docker-compose-plugin
-          - docker-compose
-      when: ansible_distribution == "Ubuntu"
-
-    - name: Remove dependencies that are no longer required
-      apt:
-        autoremove: yes
+      block:
+        - name: Remove packages
+          apt:
+            purge: yes
+            state: absent
+            pkg:
+              - docker
+              - docker-engine
+              - docker-ce-cli
+              - docker-ce-rootless-extras
+              - docker-scan-plugin
+              - docker.io
+              - containerd
+              - runc
+              - docker-compose-plugin
+              - docker-compose
+        - name: Remove dependencies that are no longer required
+          apt:
+            autoremove: yes
       when: ansible_distribution == "Ubuntu"
 
     - name: Remove all docker ressource files
