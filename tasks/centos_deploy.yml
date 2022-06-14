@@ -1,19 +1,4 @@
 ---
-- name: Reset all docker installation
-  become: true
-  yum:
-    autoremove: yes
-    state: absent
-    name:
-      - docker
-      - docker-client
-      - docker-client-latest
-      - docker-common
-      - docker-latest
-      - docker-latest-logrotate
-      - docker-logrotate
-      - docker-engine
-  when: reset_before
 
 - name: Install yum-utils
   become: true
@@ -45,18 +30,4 @@
     - docker-ce
   register: centos_docker_installed
 
-- name: Add docker compose
-  become: true
-  yum:
-    state: present
-    name:
-      - docker-compose-plugin
-  when: docker_compose
 
-- name: Start and enable docker service
-  become: True
-  systemd: 
-    name: docker
-    state: started
-    enabled: yes
-  when: centos_docker_installed.changed

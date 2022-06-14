@@ -1,15 +1,139 @@
 ---
-- name: Deploy docker on Ubuntu
-  include_tasks: ubuntu_deploy.yml
-  when: ansible_facts['distribution'] == "Ubuntu"
+- name: Reset all docker installations
+  block:
+    - name: "CentOS: Remove all docker packages"
+      yum:
+        autoremove: yes
+        state: absent
+        name:
+          - docker
+          - docker-client
+          - docker-client-latest
+          - docker-common
+          - docker-latest
+          - docker-latest-logrotate
+          - docker-logrotate
+          - docker-engine
+      when: ansible_distribution == "CentOS"
 
-- name:  Deploy docker on Centos
-  include_tasks: centos_deploy.yml
-  when: ansible_facts['distribution'] == "CentOS"
+    - name:  "Ubuntu: Remove and purge all docker packages"
+      apt:
+        purge: yes
+        state: absent
+        pkg:
+          - docker
+          - docker-engine
+          - docker-ce-cli
+          - docker-ce-rootless-extras
+          - docker-scan-plugin
+          - docker.io
+          - containerd
+          - runc
+          - docker-compose-plugin
+          - docker-compose
+      when: ansible_distribution == "Ubuntu"
 
-- name: Add connected user to the docker group
-  become: True
-  user:
-    name: ansible_user
-    groups: docker
-    append: yes
+    - name: Remove dependencies that are no longer required
+      apt:
+        autoremove: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Remove all docker ressource files
+      file:
+        name: /var/lib/docker
+        state: absent
+
+    - name: Remove docker etc configs files
+      file: 
+        name: /etc/docker
+        state:  absent
+    - name: Remove docker apparmor files
+      file:
+        name: /etc/apparmor.d/docker
+        state: absent
+
+    - name: Delete docker group
+      group:
+        name: docker
+        state: absent
+
+    - name: Remove docker sock
+      file:
+        name: /var/run/docker.sock
+        state: absent
+
+    - name: Remove docker.list file
+      file:
+        name: /etc/apt/sources.list.d/docker.list
+        state: absent
+
+  become: true
+  when: reset_before
+
+- name: Install docker on hosts
+  block:
+    - name: "Check docker installation"
+      service:
+        name: docker
+        state: started
+  rescue:
+    - name: Install Docker on CentOS
+      include_tasks: centos_deploy.yml
+      when: ansible_distribution == "CentOS"
+
+    - name: Install Docker on Ubuntu
+      include_tasks: ubuntu_deploy.yml
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Start and Enable Docker daemon service
+      become: true
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add the current user to the docker group
+      become: true
+      user:
+        name: "{{ ansible_ssh_user }}"
+        groups: docker
+        append: yes
+        state: present
+
+    - name: Install python3-pip
+      become: true
+      package:
+        name: python3-pip
+        state: present
+
+    - name: Install docker-py
+      become: true
+      pip:
+        name: docker
+        executable: pip3
+
+    - name: Check docker installation
+      become: true
+      docker_container:
+        name: hello-world
+        image: hello-world
+        auto_remove: yes
+
+- name: Add docker compose
+  block:
+    - name: "Ubuntu: docker-compose installation" 
+      become: true
+      apt:
+        pkg:
+          - docker-compose-plugin
+          - docker-compose
+      when: ansible_distribution == "Ubuntu"
+    - name: "Centos: docker-compose installation"
+      become: true
+      yum:
+        state: present
+        name:
+          - docker-compose-plugin
+          - docker-compose
+      when: ansible_distribution == "CentOS"
+  when: docker_compose

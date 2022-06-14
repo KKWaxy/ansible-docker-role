@@ -4,4 +4,4 @@
 docker_compose: true
 
 # Reset all docker packages before start new installation installation
-reset_before: true
+reset_before: false
