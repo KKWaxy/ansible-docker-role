@@ -126,7 +126,6 @@
       apt:
         pkg:
           - docker-compose-plugin
-          - docker-compose
       when: ansible_distribution == "Ubuntu"
     - name: "Centos: docker-compose installation"
       become: true
@@ -134,6 +133,5 @@
         state: present
         name:
           - docker-compose-plugin
-          - docker-compose
       when: ansible_distribution == "CentOS"
   when: docker_compose
