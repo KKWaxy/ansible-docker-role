@@ -1,6 +1,6 @@
 galaxy_info:
   author: Wilfried KOUASSI
-  role_name: docker-role
+  role_name: docker_role
   # namespace: 
   description: |
     This role permit to deploy the latest version of docker on any GNU/Linux based
