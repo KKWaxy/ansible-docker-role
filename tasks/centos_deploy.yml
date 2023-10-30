@@ -2,9 +2,9 @@
 
 - name: Install yum-utils
   become: true
-  yum:
+  ansible.builtin.yum::
     state: present
-    update_cache: yes
+    update_cache: true
     name:
       - yum-utils
 
@@ -21,13 +21,11 @@
 
 - name:  Docker packages installation
   become: true
-  yum:
+  ansible.builtin.yum:
     state: present
-    update_cache: yes
+    update_cache: true
     name:
-    - containerd.io
-    - docker-ce-cli
-    - docker-ce
+      - containerd.io
+      - docker-ce-cli
+      - docker-ce
   register: centos_docker_installed
-
-
