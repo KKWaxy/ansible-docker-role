@@ -1,9 +1,12 @@
 ---
+
 - name: Reset all docker installations
+  become: true
+  when: reset_before
   block:
     - name: "CentOS: Remove all docker packages"
-      yum:
-        autoremove: yes
+      ansible.builtin.yum:
+        autoremove: true
         state: absent
         name:
           - docker
@@ -16,11 +19,12 @@
           - docker-engine
       when: ansible_distribution == "CentOS"
 
-    - name:  "Ubuntu: Remove and purge all docker packages"
+    - name: "Ubuntu: Remove and purge all docker packages"
+      when: ansible_distribution == "Ubuntu"
       block:
         - name: Remove packages
-          apt:
-            purge: yes
+          ansible.builtin.apt:
+            purge: true
             state: absent
             pkg:
               - docker
@@ -34,104 +38,101 @@
               - docker-compose-plugin
               - docker-compose
         - name: Remove dependencies that are no longer required
-          apt:
-            autoremove: yes
-      when: ansible_distribution == "Ubuntu"
+          ansible.builtin.apt:
+            autoremove: true
 
     - name: Remove all docker ressource files
-      file:
+      ansible.builtin.file:
         name: /var/lib/docker
         state: absent
 
     - name: Remove docker etc configs files
-      file: 
+      ansible.builtin.file:
         name: /etc/docker
-        state:  absent
+        state: absent
     - name: Remove docker apparmor files
-      file:
+      ansible.builtin.file:
         name: /etc/apparmor.d/docker
         state: absent
 
     - name: Delete docker group
-      group:
+      ansible.builtin.group:
         name: docker
         state: absent
 
     - name: Remove docker sock
-      file:
+      ansible.builtin.file:
         name: /var/run/docker.sock
         state: absent
 
     - name: Remove docker.list file
-      file:
+      ansible.builtin.file:
         name: /etc/apt/sources.list.d/docker.list
         state: absent
 
-  become: true
-  when: reset_before
 
 - name: Install docker on hosts
   block:
     - name: "Check docker installation"
-      service:
+      ansible.builtin.service:
         name: docker
         state: started
   rescue:
     - name: Install Docker on CentOS
-      include_tasks: centos_deploy.yml
+      ansible.builtin.include_tasks: centos_deploy.yml
       when: ansible_distribution == "CentOS"
 
     - name: Install Docker on Ubuntu
-      include_tasks: ubuntu_deploy.yml
+      ansible.builtin.include_tasks: ubuntu_deploy.yml
       when: ansible_distribution == "Ubuntu"
 
     - name: Start and Enable Docker daemon service
       become: true
-      service:
+      ansible.builtin.service:
         name: docker
         state: started
-        enabled: yes
+        enabled: true
 
     - name: Add the current user to the docker group
       become: true
-      user:
+      ansible.builtin.user:
         name: "{{ ansible_ssh_user }}"
         groups: docker
-        append: yes
+        append: true
         state: present
 
     - name: Install python3-pip
       become: true
-      package:
+      ansible.builtin.package:
         name: python3-pip
         state: present
 
     - name: Install docker-py
       become: true
-      pip:
+      ansible.builtin.pip:
         name: docker
         executable: pip3
 
     - name: Check docker installation
       become: true
-      docker_container:
+      community.docker.docker_container:
         name: hello-world
         image: hello-world
-        auto_remove: yes
+        auto_remove: true
 
 - name: Add docker compose
+  when: docker_compose
   block:
-    - name: "Ubuntu: docker-compose installation" 
+    - name: "Ubuntu: docker-compose installation"
       become: true
-      apt:
+      ansible.builtin.apt:
         pkg:
           - docker-compose-plugin
       when: ansible_distribution == "Ubuntu"
     - name: "Centos: docker-compose installation"
       become: true
-      yum:
+      ansible.builtin.yum:
         state: present
         name:
           - docker-compose-plugin
       when: ansible_distribution == "CentOS"
-  when: docker_compose

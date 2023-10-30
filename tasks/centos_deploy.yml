@@ -2,7 +2,7 @@
 
 - name: Install yum-utils
   become: true
-  ansible.builtin.yum::
+  ansible.builtin.yum:
     state: present
     update_cache: true
     name:
@@ -10,16 +10,16 @@
 
 - name: Check if docker-ce.repo repo is present
   become: true
-  stat:
+  ansible.builtin.stat:
     path: /etc/yum.repos.d/docker-ce.repo
   register: docker_ce_repos
 
 - name: Configure repository
   become: true
-  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-  when: not docker_ce_repos.stat.exists 
+  ansible.builtin.shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  when: not docker_ce_repos.stat.exists
 
-- name:  Docker packages installation
+- name: Docker packages installation
   become: true
   ansible.builtin.yum:
     state: present
