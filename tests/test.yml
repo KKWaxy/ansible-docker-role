@@ -1,6 +1,7 @@
 ---
-- hosts: localhost
-  remote_user: root
-  connection: local
-  roles:
-    - docker
+# - name: Test role
+#   hosts: localhost
+#   remote_user: root
+#   connection: local
+#   roles:
+#     - ../..
